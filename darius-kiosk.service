@@ -1,0 +1,53 @@
+# Source: https://github.com/cage-kiosk/cage/wiki/Starting-Cage-on-boot-with-systemd
+
+# This is a system unit for launching Cage with auto-login as the
+# user configured here. For this to work, wlroots must be built
+# with systemd logind support.
+
+[Unit]
+Description=Cage Wayland compositor on tty0
+# Make sure we are started after logins are permitted. If Plymouth is
+# used, we want to start when it is on its way out.
+After=systemd-user-sessions.service plymouth-quit-wait.service
+# Since we are part of the graphical session, make sure we are started
+# before it is complete.
+Before=graphical.target
+# On systems without virtual consoles, do not start.
+ConditionPathExists=/dev/tty0
+# D-Bus is necessary for contacting logind, which is required.
+Wants=dbus.socket systemd-logind.service
+After=dbus.socket systemd-logind.service
+# Replace any (a)getty that may have spawned, since we log in
+# automatically.
+Conflicts=getty@tty0.service
+After=getty@tty0.service
+# Ensure network online
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=simple
+# Ensure internet is accessible
+ExecStartPre=/usr/bin/bash -c 'ping -q -c1 1.1.1.1 &>/dev/null && exit 0 || exit 1'
+ExecStart=/usr/bin/cage -- /usr/bin/microsoft-edge INSERT_URL_HERE --kiosk --no-first-run
+ExecStartPost=+sh -c "tty_name='tty0'; exec chvt ${tty_name#tty}"
+ExecStopPost=/usr/bin/systemctl restart getty@tty0
+Restart=always
+User=cage
+# Log this user with utmp, letting it show up with commands 'w' and
+# 'who'. This is needed since we replace (a)getty.
+UtmpIdentifier=tty0
+UtmpMode=user
+# A virtual terminal is needed.
+TTYPath=/dev/tty0
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+# Fail to start if not controlling the virtual terminal.
+StandardInput=tty-fail
+
+# Set up a full (custom) user session for the user, required by Cage.
+PAMName=cage
+
+[Install]
+WantedBy=graphical.target
