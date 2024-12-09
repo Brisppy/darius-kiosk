@@ -5,7 +5,7 @@
 # with systemd logind support.
 
 [Unit]
-Description=Cage Wayland compositor on tty0
+Description=Cage Wayland compositor on tty1
 # Make sure we are started after logins are permitted. If Plymouth is
 # used, we want to start when it is on its way out.
 After=systemd-user-sessions.service plymouth-quit-wait.service
@@ -13,14 +13,14 @@ After=systemd-user-sessions.service plymouth-quit-wait.service
 # before it is complete.
 Before=graphical.target
 # On systems without virtual consoles, do not start.
-ConditionPathExists=/dev/tty0
+ConditionPathExists=/dev/tty1
 # D-Bus is necessary for contacting logind, which is required.
 Wants=dbus.socket systemd-logind.service
 After=dbus.socket systemd-logind.service
 # Replace any (a)getty that may have spawned, since we log in
 # automatically.
-Conflicts=getty@tty0.service
-After=getty@tty0.service
+Conflicts=getty@tty1.service
+After=getty@tty1.service
 # Ensure network online
 Wants=network-online.target
 After=network.target network-online.target
@@ -30,16 +30,15 @@ Type=simple
 # Ensure internet is accessible
 ExecStartPre=/usr/bin/bash -c 'ping -q -c1 1.1.1.1 &>/dev/null && exit 0 || exit 1'
 ExecStart=/usr/bin/cage -- /usr/bin/microsoft-edge INSERT_URL_HERE --kiosk --no-first-run
-ExecStartPost=+sh -c "tty_name='tty0'; exec chvt ${tty_name#tty}"
-ExecStopPost=/usr/bin/systemctl restart getty@tty0
 Restart=always
+RestartSec=3
 User=cage
 # Log this user with utmp, letting it show up with commands 'w' and
 # 'who'. This is needed since we replace (a)getty.
-UtmpIdentifier=tty0
+UtmpIdentifier=tty1
 UtmpMode=user
 # A virtual terminal is needed.
-TTYPath=/dev/tty0
+TTYPath=/dev/tty1
 TTYReset=yes
 TTYVHangup=yes
 TTYVTDisallocate=yes
