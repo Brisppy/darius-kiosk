@@ -24,6 +24,9 @@ After=getty@tty1.service
 # Ensure network online
 Wants=network-online.target
 After=network.target network-online.target
+OnFailure=getty@tty1.service
+StartLimitBurst=3
+StartLimitIntervalSec=30
 
 [Service]
 Type=simple
