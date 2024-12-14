@@ -30,8 +30,6 @@ StartLimitIntervalSec=30
 
 [Service]
 Type=simple
-# Ensure internet is accessible
-ExecStartPre=/usr/bin/bash -c 'ping -q -c1 1.1.1.1 &>/dev/null && exit 0 || exit 1'
 ExecStart=/usr/bin/cage -- /usr/bin/microsoft-edge INSERT_URL_HERE --kiosk --no-first-run
 Restart=always
 RestartSec=3
