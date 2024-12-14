@@ -16,7 +16,7 @@ if [[ "$MODIFY_LANDING_PAGE" == "y" || "$MODIFY_LANDING_PAGE" == "Y" ]]; then
   SCRIPT_DIR=$(dirname "$0")
 
   if [[ "$INCOGNITO_ENABLED" == "y" || "$INCOGNITO_ENABLED" == "Y" ]]; then
-    sed "s%INSERT_URL_HERE%$LANDING_PAGE_URL --incognito%g" "$SCRIPT_DIR/darius-kiosk.service" > "/etc/systemd/system/darius-kiosk.service"
+    sed "s%INSERT_URL_HERE%$LANDING_PAGE_URL --inprivate%g" "$SCRIPT_DIR/darius-kiosk.service" > "/etc/systemd/system/darius-kiosk.service"
   else
     sed "s%INSERT_URL_HERE%$LANDING_PAGE_URL%g" "$SCRIPT_DIR/darius-kiosk.service" > "/etc/systemd/system/darius-kiosk.service"
   fi
