@@ -11,3 +11,4 @@ A packaged ISO which launches a locked down Microsoft Edge browser. An included 
  * Terminal can be entered by repeatedly pressing (CTRL+W) until a TTY appears.
  * 'restart-kiosk' command can be used to restart the Kiosk application.
  * 'configure' command allows you to change the landing page and wireless configuration.
+ * Customized banner and MOTD
