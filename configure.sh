@@ -8,9 +8,19 @@ read -r MODIFY_LANDING_PAGE
 if [[ "$MODIFY_LANDING_PAGE" == "y" || "$MODIFY_LANDING_PAGE" == "Y" ]]; then
   echo "Enter the URL of the website you wish to display on startup."
   read -r LANDING_PAGE_URL
-  # create modified systemd service
+
+  echo "Would you like the browser to run in incognito mode? y/N"
+  read -r INCOGNITO_ENABLED
+
+    # create modified systemd service
   SCRIPT_DIR=$(dirname "$0")
-  sed "s%INSERT_URL_HERE%$LANDING_PAGE_URL%g" "$SCRIPT_DIR/darius-kiosk.service" > "/etc/systemd/system/darius-kiosk.service"
+
+  if [[ "$INCOGNITO_ENABLED" == "y" || "$INCOGNITO_ENABLED" == "Y" ]]; then
+    sed "s%INSERT_URL_HERE%$LANDING_PAGE_URL --incognito%g" "$SCRIPT_DIR/darius-kiosk.service" > "/etc/systemd/system/darius-kiosk.service"
+  else
+    sed "s%INSERT_URL_HERE%$LANDING_PAGE_URL%g" "$SCRIPT_DIR/darius-kiosk.service" > "/etc/systemd/system/darius-kiosk.service"
+  fi
+
   systemctl daemon-reload
   systemctl enable darius-kiosk.service
 fi
